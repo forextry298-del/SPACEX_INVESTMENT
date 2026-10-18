@@ -1,0 +1,97 @@
+/* NILE — CODEX COLOR SYSTEM */
+
+html,body{
+  background:#000!important;
+  color:#fff!important;
+}
+
+body,
+.nile-wrap,
+.my-page,
+.page,
+main,
+section,
+.panel{
+  color:#fff!important;
+}
+
+.panel,
+.my-balance,
+.my-menu,
+.my-share,
+.my-salary,
+.my-invites,
+.my-rewards{
+  background:rgba(0,0,0,.45)!important;
+  border-color:#00aee8!important;
+}
+
+h1,h2,h3,h4,
+.nile-brand,
+.nile-sub,
+.my-label,
+.my-agent,
+.my-page span,
+.my-page strong,
+.my-page p{
+  color:#fff!important;
+}
+
+.nile-brand span,
+.my-share h2,
+.my-share strong,
+.my-salary strong,
+.my-invites strong{
+  color:#00c6ff!important;
+}
+
+.my-menu .my-grid>a>i{
+  background:#10c5f5!important;
+  color:#fff!important;
+  border:0!important;
+}
+
+.my-menu .my-grid>a>i svg,
+.my-menu .my-grid>a>i svg *{
+  stroke:#fff!important;
+  fill:none!important;
+}
+
+button,
+.my-wide-btn,
+.my-signout{
+  background:#00bde8!important;
+  color:#fff!important;
+  border-color:#00bde8!important;
+}
+
+input,
+select,
+textarea{
+  background:#02070b!important;
+  color:#fff!important;
+  border-color:#008dcc!important;
+}
+
+a{
+  color:#00c6ff;
+}
+
+.bottom-nav{
+  background:rgba(0,0,0,.94)!important;
+  border-color:#008dcc!important;
+}
+
+.bottom-nav a{
+  color:#fff!important;
+}
+
+.bottom-nav a.active,
+.bottom-nav .active{
+  color:#00c6ff!important;
+}
+
+.codex-lightning-bg,
+.codex-green-waves{
+  pointer-events:none!important;
+}

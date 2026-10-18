@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% block content %}
+<div id="admin-unread-messages" style="margin:18px 0;background:linear-gradient(135deg,#071b20,#102e2b);border:1px solid #28564d;border-radius:24px;overflow:hidden;color:#eafff5">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #28564d;font-size:22px;font-weight:800"><span>💬 Unread Messages</span><span id="admin-unread-count" style="background:#ed101d;color:white;border-radius:22px;padding:5px 17px">0</span></div>
+<div id="admin-unread-list" style="padding:22px;color:#a9c5bd;text-align:center">Loading unread messages…</div></div>
+<script>
+fetch('/admin/unread-messages',{credentials:'same-origin'}).then(r=>{if(!r.ok)throw Error();return r.json()}).then(d=>{
+document.getElementById('admin-unread-count').textContent=d.count;
+const l=document.getElementById('admin-unread-list');l.replaceChildren();
+if(!d.users.length){l.textContent='✓ No unread messages';return}
+d.users.forEach(u=>{const a=document.createElement('a');a.href='/admin/chat/'+u.id;a.style='display:flex;justify-content:space-between;padding:13px 4px;color:#eafff5;text-decoration:none;border-bottom:1px solid #28564d';const n=document.createElement('span');n.textContent=u.name||u.phone||('User '+u.id);const b=document.createElement('b');b.textContent=u.unread+' unread';b.style.color='#ff5360';a.append(n,b);l.append(a)})
+}).catch(()=>document.getElementById('admin-unread-list').textContent='Could not load unread messages. Refresh the page.');
+</script>
+
+<style id="nile-compact-admin">
+.admin-shell,.admin-top,.section{box-sizing:border-box;min-width:0}
+.admin-shell{width:100%;max-width:1100px;margin:0 auto;padding:10px}
+.admin-top,.section{padding:12px!important;margin:10px 0!important;border-radius:12px}
+.admin-shell h1,.admin-shell h2,.admin-top h2,.section h2{
+  font-size:clamp(15px,4vw,19px)!important;line-height:1.3;margin:0 0 10px
+}
+.admin-shell p,.admin-top p,.section p{font-size:12px;line-height:1.45}
+.admin-shell button,.admin-top button,.section button{
+  max-width:100%;font-size:12px!important;padding:9px 12px!important;
+  border-radius:9px;white-space:normal
+}
+.admin-shell input,.admin-shell select,.admin-shell textarea,
+.admin-top input,.admin-top select,.admin-top textarea,
+.section input,.section select,.section textarea{
+  box-sizing:border-box;max-width:100%;min-width:0;font-size:13px!important
+}
+.admin-top form,.section form{max-width:100%}
+.admin-top table,.section table{width:100%;font-size:12px}
+.admin-top{overflow-wrap:anywhere}
+.nile-total-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.nile-total-card{min-width:0;padding:13px;border:1px solid #087f9b;border-radius:12px;background:#020b11}
+.nile-total-card small{display:block;font-size:11px;color:#9db6c3;margin-bottom:7px}
+.nile-total-card strong{display:block;font-size:clamp(16px,4.5vw,23px);color:#08cfff;overflow-wrap:anywhere}
+@media(max-width:520px){
+  .admin-shell{padding:7px}
+  .admin-top,.section{padding:10px!important;margin:8px 0!important}
+  .nile-total-grid{gap:7px}
+  .nile-total-card{padding:10px}
+  .admin-top table,.section table{display:block;overflow-x:auto;white-space:nowrap}
+}
+</style>
+<div class="nile-total-grid">
+  <div class="nile-total-card">
+    <small>Approved Deposits</small>
+    <strong>UGX {{ "{:,.2f}".format(approved_deposit_total|default(0)|float) }}</strong>
+  </div>
+  <div class="nile-total-card">
+    <small>Pending + Approved Withdrawals</small>
+    <strong>UGX {{ "{:,.2f}".format(approved_withdrawal_total|default(0)|float) }}</strong>
+  </div>
+</div>
+
+<div class="admin-shell">
+<div class="title">NILE ADMIN</div>
+<div class="admin-subtitle">Platform management</div>
+
+<div class="admin-shortcuts">
+<a href="#users">Search &amp; Users</a>
+<a href="#deposits">Deposits</a>
+<a href="#withdrawals">Withdrawals</a>
+<a href="#messages">User Messages{% if unread_total %} <span style="background:#ed2939;color:white;border-radius:12px;padding:2px 7px">{{ unread_total }}</span>{% endif %}</a>
+<a href="#broadcast">Message All</a>
+<a href="#transactions">Transactions</a>
+<a href="#gift-codes">Gift Codes</a>
+
+</div>
+
+
+
+{% with msgs=get_flashed_messages(with_categories=true) %}
+{% for cat,msg in msgs %}<div class="section"><b>{{msg}}</b></div>{% endfor %}
+{% endwith %}
+
+<div class="section admin-top" id="announcements"><h2>Send Announcement</h2>
+<form method="post" action="/admin/announcement">
+<input name="title" placeholder="Announcement title" required>
+<textarea name="message" rows="4" placeholder="Write announcement..." required></textarea>
+<button type="submit">SEND ANNOUNCEMENT</button>
+</form>
+
+{% for a in announcements %}
+<div class="row" style="display:block;margin-top:10px">
+<strong>{{a.title}}</strong><br>
+<small>{{a.created_at}}</small><br>
+{{a.message}}
+</div>
+{% endfor %}
+</div>
+
+
+<div class="section admin-top" id="broadcast-all-users">
+  <h2>Message All Users</h2>
+  <p>Send a message or image directly into every registered user's existing Chats conversation.</p>
+  <form method="post" action="/admin/support/broadcast" enctype="multipart/form-data">
+    <textarea name="message" rows="4" placeholder="Write your message..."></textarea>
+    <label style="display:block;margin:12px 0;color:inherit">
+      Attach image (JPG, PNG, GIF, WEBP)
+      <input type="file" name="media" accept="image/jpeg,image/png,image/gif,image/webp">
+    </label>
+    <button type="submit">Send to All Users</button>
+  </form>
+</div>
+
+<div class="section admin-top" id="broadcast"><h2>Send Message To Registered User</h2>
+<form method="post" action="/admin/support/send">
+<select name="uid" required>
+<option value="">Select registered user</option>
+{% for u in users %}
+<option value="{{u.id}}">{{u.display_name or u.phone}} — {{u.phone}}</option>
+{% endfor %}
+</select>
+<textarea name="message" rows="4" placeholder="Welcome to SPACEX INVESTMENT..." required></textarea>
+<button type="submit">SEND MESSAGE</button>
+</form>
+</div>
+
+<div class="section admin-top" id="users"><h2>Users</h2>
+{% for u in users %}
+<div class="row" style="display:block;margin-bottom:12px">
+<b>{{u.display_name or u.phone}}</b><br>
+<small>{{u.phone}} | ID {{u.id}} | Last seen: {{u.last_seen or "Never"}}</small><br>
+<b>UGX {{'%.0f'|format(u.balance or 0)}}</b>
+{% if u.is_blocked %}<span style="color:red"> BLOCKED</span>{% endif %}
+{% if u.team_admin %}<span style="color:#08a"> TEAM ADMIN</span>{% endif %}
+{% set unread = unread_by_user.get(u.id, 0) %}
+<a href="/admin/chat/{{ u.id }}" style="display:inline-block;margin:5px;padding:7px 10px;background:#102b3a;border:1px solid #087f9b;border-radius:8px;color:#dffaff;text-decoration:none;font-weight:bold">VIEW CHAT{% if unread %} <span style="background:#ed2939;color:white;border-radius:12px;padding:2px 7px">{{ unread }}</span>{% endif %}</a>
+{% if u.team_admin %}
+<a href="/admin/team/{{ u.id }}" style="display:inline-block;margin:6px;padding:8px 12px;background:#087fbd;color:white;border-radius:7px;text-decoration:none;font-weight:bold">VIEW TEAM</a>
+{% endif %}
+
+<form method="post" action="/admin/user/{{u.id}}/balance" style="margin-top:6px">
+<input name="amount" type="number" step="0.01" value="{{u.balance or 0}}" placeholder="Balance">
+<button>Set Balance</button>
+</form>
+
+<form method="post" action="/admin/user/{{u.id}}/reset-password" style="margin-top:6px">
+<input name="password" type="password" placeholder="New password" required>
+<button>Reset Password</button>
+</form>
+
+<form method="post" action="/admin/user/{{u.id}}/{{"unblock" if u.is_blocked else "block"}}" style="display:inline">
+<button>{{"Unblock" if u.is_blocked else "Block"}}</button>
+</form>
+
+<form method="post" action="/admin/user/{{u.id}}/admin" style="display:inline">
+<input type="hidden" name="value" value="{{0 if u.team_admin else 1}}">
+<button>{{"Remove Team Admin" if u.team_admin else "Make Team Admin"}}</button>
+</form>
+</div>
+{% else %}<p>No users.</p>{% endfor %}
+</div>
+
+<div class="section admin-top" id="deposits"><h2>Deposits</h2>
+{% for t in deposits %}
+<div class="row">
+<div>
+<strong>{{t.phone}}</strong> — UGX {{'%.0f'|format(t.amount)}} — {{t.status or t.deposit_status}}
+
+{% if t.deposit_method %}
+<br><small><b>Method:</b> {{t.deposit_method}}</small>
+{% endif %}
+
+{% if t.deposit_agent %}
+<br><small><b>Payment Agent:</b> {{t.deposit_agent}}</small>
+{% endif %}
+
+{% if t.deposit_proof %}
+<br><small><b>Transaction ID:</b> {{t.deposit_proof}}</small>
+{% endif %}
+
+{% if t.deposit_payer_number %}
+<br><small><b>Number that paid:</b> {{t.deposit_payer_number}}</small>
+{% endif %}
+</div>
+
+{% if t.status=="PENDING" %}
+<span>
+<form method="post" action="/admin/transaction/{{t.id}}/approve" style="display:inline">
+<button>Approve</button>
+</form>
+
+<form method="post" action="/admin/transaction/{{t.id}}/reject" style="display:inline">
+<button>Reject</button>
+</form>
+</span>
+{% endif %}
+</div>
+{% else %}
+<p>No deposits.</p>
+{% endfor %}
+</div>
+
+<div class="section admin-top" id="withdrawals"><h2>Withdraw Requests</h2>
+{% for w in withdrawals %}
+<div class="row" style="display:block;margin-bottom:10px">
+<strong>{{w.phone}}</strong>
+— UGX {{'%.0f'|format(w.amount)}}
+— {{w.status}}
+
+{% if w.reference %}
+<br><small><b>Reference:</b> {{w.reference}}</small>
+{% endif %}
+
+{% if w.mtn_number %}
+<br><small><b>MTN:</b> {{w.mtn_number}}</small>
+{% endif %}
+
+{% if w.airtel_number %}
+<br><small><b>Airtel:</b> {{w.airtel_number}}</small>
+{% endif %}
+
+{% if w.usdt_wallet %}
+<br><small><b>USDT TRC20:</b> {{w.usdt_wallet}}</small>
+{% endif %}
+
+{% if w.status=="PENDING" %}
+<div style="margin-top:8px">
+<form method="post" action="/admin/transaction/{{w.id}}/approve" style="display:inline">
+<button>Approve</button>
+</form>
+<form method="post" action="/admin/transaction/{{w.id}}/reject" style="display:inline">
+<button>Reject</button>
+</form>
+</div>
+{% endif %}
+</div>
+{% else %}
+<p>No withdrawal requests.</p>
+{% endfor %}
+</div>
+
+<div class="section admin-top" id="transactions"><h2>All Transactions</h2>
+{% for t in tx %}
+<div class="row"><span>{{t.phone}} — {{t.kind}} — UGX {{'%.0f'|format(t.amount)}}</span><span>{{t.status}}</span></div>
+{% else %}<p>No transactions.</p>{% endfor %}
+</div>
+
+<div class="section admin-top" id="gift-codes"><h2>Gift Codes</h2>
+<form method="post" action="/admin/gift/create">
+<input name="code" placeholder="Code (optional)">
+<input name="amount" type="number" step="0.01" placeholder="Reward UGX" required>
+<input name="max_uses" type="number" min="1" value="1" placeholder="Claim limit">
+<button>Create Gift Code</button>
+</form>
+{% for g in gifts %}
+<div class="row" style="display:block;margin-top:10px">
+<b>{{g.code}}</b> — UGX {{'%.0f'|format(g.amount)}} — {{g.claims}}/{{g.max_uses}} claims
+{% if g.enabled %} ACTIVE{% else %} EXPIRED/DISABLED{% endif %}
+<form method="post" action="/admin/gift/{{g.code}}/edit" style="margin-top:5px">
+<input name="amount" type="number" value="{{g.amount}}" required>
+<input name="max_uses" type="number" min="1" value="{{g.max_uses}}" required>
+<button>Save</button>
+</form>
+<form method="post" action="/admin/gift/{{g.code}}/toggle" style="display:inline">
+<button>{{"Disable" if g.enabled else "Enable"}}</button>
+</form>
+<a href="/admin/gift/{{g.code}}/claims"><button type="button">Claims</button></a>
+</div>
+{% else %}<p>No gift codes.</p>{% endfor %}
+</div>
+
+<div class="section admin-top" id="admin-access"><h2>Admin Access</h2>
+<p>Admin permissions can be changed from the Users section above.</p>
+</div>
+
+<div class="section admin-top" id="password-requests"><h2>Password Requests</h2>
+{% for r in requests %}
+<div class="row"><span>User {{r.uid}} — {{r.status}}</span></div>
+{% else %}<p>No password requests.</p>{% endfor %}
+</div>
+
+<div class="section admin-top" id="messages"><h2>Support Messages</h2>
+{% for m in messages %}
+<div class="row" style="display:block;margin-bottom:8px">
+<b>User {{m.uid}}</b>: {{m.message}}
+<form method="post" action="/admin/support/{{m.uid}}">
+<input name="message" placeholder="Reply">
+<button>Send</button>
+</form>
+</div>
+{% else %}<p>No messages.</p>{% endfor %}
+</div>
+
+<div class="section admin-top" id="activity"><h2>Admin Activity</h2>
+<a href="/admin/activity"><button>View Full Activity Log</button></a>
+{% for a in activity %}
+<div class="row"><span>{{a.action}} — {{a.details}}</span><small>{{a.created_at}}</small></div>
+{% endfor %}
+</div>
+
+
+<style id="nile-mobile-admin-layout">
+.admin-shell{width:100%;max-width:1000px;margin:0 auto;padding:12px 0 36px;box-sizing:border-box}
+.admin-shell *{box-sizing:border-box;overflow-wrap:anywhere}
+.admin-shell .title{font-size:clamp(23px,5vw,32px);font-weight:800;letter-spacing:.3px;margin:8px 0 5px}
+.admin-subtitle{font-size:13px;opacity:.72;margin-bottom:16px}
+.admin-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:16px 0 22px}
+.admin-shortcuts a{display:flex;align-items:center;justify-content:center;min-height:48px;padding:11px 9px;border:1px solid var(--border-color,rgba(128,128,128,.28));border-radius:12px;text-decoration:none;color:inherit;font-size:13px;font-weight:700;text-align:center}
+.admin-shell .section{min-width:0;padding:15px;margin:0 0 15px;border:1px solid var(--border-color,rgba(128,128,128,.22));border-radius:15px;overflow:hidden}
+.admin-shell .section h2{font-size:17px;line-height:1.35;margin:0 0 13px}
+.admin-shell .row{min-width:0;padding:12px;margin:10px 0;border-radius:11px;display:block;overflow-wrap:anywhere}
+.admin-shell form{min-width:0;max-width:100%;margin-top:8px}
+.admin-shell input:not([type=checkbox]):not([type=radio]),.admin-shell select,.admin-shell textarea{display:block;width:100%;max-width:100%;min-width:0;margin:7px 0;padding:12px;border-radius:10px;font:inherit}
+.admin-shell button{max-width:100%;min-height:42px;padding:10px 14px;border-radius:10px;font:inherit;font-weight:700;white-space:normal;overflow-wrap:anywhere}
+.admin-shell form[style*="inline"]{display:inline-block;vertical-align:middle;margin:5px 5px 0 0}
+.admin-shell small{overflow-wrap:anywhere}
+.admin-shell a{overflow-wrap:anywhere}
+.admin-shell .admin-top{scroll-margin-top:12px}
+@media(min-width:650px){
+ .admin-shell{padding:20px}
+ .admin-shortcuts{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .admin-shell .section{padding:20px}
+ .admin-shell .row{padding:15px}
+}
+@media(max-width:380px){
+ .admin-shell{padding:6px 0 25px}
+ .admin-shell .section{padding:11px}
+ .admin-shortcuts{gap:6px}
+ .admin-shortcuts a{font-size:12px;padding:9px 5px}
+}
+</style>
+
+</div>
+{% endblock %}

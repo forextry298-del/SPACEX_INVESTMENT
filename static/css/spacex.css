@@ -1,0 +1,31 @@
+
+/* SPACEX INVESTMENT — black and gold theme */
+:root {
+  color-scheme: dark;
+  --spacex-gold: #d6ad55;
+  --spacex-bg: #050505;
+  --spacex-panel: #101010;
+  --spacex-text: #f4f0e7;
+  --spacex-muted: #aaa49a;
+}
+html, body {
+  background: var(--spacex-bg);
+  color: var(--spacex-text);
+}
+body {
+  min-height: 100vh;
+  position: relative;
+}
+input, select, textarea {
+  background: #111 !important;
+  color: var(--spacex-text) !important;
+  border: 1px solid #555 !important;
+  border-radius: 8px;
+}
+button, input[type="submit"], .btn {
+  background: var(--spacex-gold);
+  color: #080808;
+  border-color: var(--spacex-gold);
+  border-radius: 8px;
+}
+a { color: var(--spacex-gold); }

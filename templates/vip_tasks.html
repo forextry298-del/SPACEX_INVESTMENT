@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.vip-page{
+  min-height:calc(100vh - 120px);
+  padding:0 12px 90px;
+  background:#000;
+  color:#fff;
+}
+
+.vip-head{
+  height:62px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  border-bottom:1px solid #222;
+  margin:0 -12px 24px;
+}
+
+.vip-back{
+  position:absolute;
+  left:18px;
+  color:#fff;
+  font-size:32px;
+  line-height:1;
+}
+
+.vip-title{
+  color:#fff;
+  font-size:27px;
+  font-weight:800;
+}
+
+.vip-card{
+  position:relative;
+  width:100%;
+  box-sizing:border-box;
+  min-height:112px;
+  margin:0 0 14px;
+  padding:16px 28px 15px;
+  border-radius:22px;
+  color:#111;
+  overflow:hidden;
+}
+
+.vip-card.v1{background:#f1f1f1;}
+.vip-card.v2{background:#dcdcdc;}
+.vip-card.v3{background:#555;}
+.vip-card.v4{background:#f2c21a;}
+.vip-card.v5{background:#51b957;}
+.vip-card.v6{background:#238be0;}
+
+.vip-card.v3,
+.vip-card.v4,
+.vip-card.v5,
+.vip-card.v6{
+  color:#fff;
+}
+
+.vip-level{visibility:hidden;
+  position:absolute;
+  top:23px;
+  right:28px;
+  font-size:15px;
+  font-weight:800;
+}
+
+.vip-text{white-space:nowrap;
+  font-size:15px;
+  line-height:1.35;
+  padding-right:0;
+  margin-bottom:12px;
+}
+
+.vip-text b{
+  font-weight:800;
+}
+
+.vip-progress,.vip-reward{white-space:nowrap;}.vip-progress,
+.vip-reward{
+  font-size:15px;
+  font-weight:700;
+  line-height:1.45;
+}
+
+.vip-close{
+  position:absolute;
+  right:22px;
+  bottom:20px;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.20);
+  color:#111;
+  font-size:31px;
+  font-weight:300;
+}
+
+.v3 .vip-close,
+.v4 .vip-close,
+.v5 .vip-close,
+.v6 .vip-close{
+  color:#fff;
+  background:rgba(0,0,0,.20);
+}
+
+@media(max-width:420px){
+  .vip-card{
+    min-height:112px;
+    padding:27px 28px 23px;
+  }
+
+  .vip-text{white-space:nowrap;
+    font-size:17px;
+  }
+
+  .vip-progress,.vip-reward{white-space:nowrap;}.vip-progress,
+  .vip-reward{
+    font-size:15px;
+  }
+
+  .vip-level{visibility:hidden;
+    font-size:21px;
+  }
+}
+</style>
+
+<div class="vip-page">
+<style>
+.vip-page{min-height:calc(100vh - 120px);padding:0 10px 80px;background:#000;color:#fff}
+.vip-head{height:48px;display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid #222;margin:0 -10px 14px}
+.vip-back{position:absolute;left:15px;color:#fff;font-size:27px;text-decoration:none}
+.vip-title{font-size:22px;font-weight:800;color:#fff}
+.vip-card{position:relative;box-sizing:border-box;min-height:83px;margin:0 0 10px;padding:11px 14px;border-radius:13px;color:#111;overflow:hidden;box-shadow:0 3px 10px #0008}
+.vip-card.v1{background:linear-gradient(110deg,#fff2ad,#f1c933)}
+.vip-card.v2{background:linear-gradient(110deg,#d9ffd9,#51b957)}
+.vip-card.v3{background:linear-gradient(110deg,#c5e9ff,#238be0);color:#102338}
+.vip-card.v4{background:linear-gradient(110deg,#ead7ff,#9953d6);color:#241333}
+.vip-card.v5{background:linear-gradient(110deg,#ffe0bd,#f28b2e);color:#38200a}
+.vip-card.v6{background:linear-gradient(110deg,#d3f7f0,#16a99a);color:#092c29}
+.vip-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+.vip-level{font-size:13px;font-weight:900}
+.vip-status{font-size:10px;font-weight:900;padding:4px 7px;border-radius:20px;background:#0002}
+.vip-text{font-size:12px;line-height:1.35;margin-bottom:5px}
+.vip-progress,.vip-reward{font-size:11px;line-height:1.5;font-weight:700}
+.vip-bar{height:4px;background:#0002;border-radius:5px;overflow:hidden;margin:5px 0}
+.vip-bar span{display:block;height:100%;background:#1118;border-radius:5px}
+</style>
+<div class="vip-head"><a class="vip-back" href="/my">‹</a><div class="vip-title">VIP Task</div></div>
+{% for task in vip_tasks %}
+<div class="vip-card v{{ task.level }}">
+<div class="vip-top"><div class="vip-level">VIP LEVEL {{ task.level }}</div><div class="vip-status">{% if task.paid %}REWARD PAID{% elif task.completed %}COMPLETED{% else %}IN PROGRESS{% endif %}</div></div>
+<div class="vip-text">Invite <b>{{ task.required }} LV1 members</b> to purchase a machine</div>
+<div class="vip-progress">Task progress: {{ task.progress }}/{{ task.required }}</div>
+<div class="vip-bar"><span style="width:{{ (task.progress * 100 / task.required)|int }}%"></span></div>
+<div class="vip-reward">VIP Reward: UGX {{ "{:,.2f}".format(task.reward) }}{% if task.paid %} · Credited to balance{% endif %}</div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

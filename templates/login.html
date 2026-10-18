@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.auth-card {
+  max-width: 420px;
+  margin: 28px auto;
+  padding: 25px 20px;
+  box-sizing: border-box;
+  background: #090909 !important;
+  color: #fff !important;
+  border: 1px solid #f5c518 !important;
+  border-radius: 18px;
+}
+.auth-card h2 {
+  color: #f5c518 !important;
+  text-align: center;
+}
+.auth-card p {
+  color: #ccc !important;
+  text-align: center;
+}
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.auth-card .auth-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 13px;
+  box-sizing: border-box;
+  background: #000 !important;
+  color: #fff !important;
+  border: 1px solid #888 !important;
+  border-radius: 10px;
+}
+.auth-card .auth-input:focus {
+  border-color: #f5c518 !important;
+}
+.auth-card .auth-btn {
+  min-height: 49px;
+  margin-top: 5px;
+  background: #f5c518 !important;
+  color: #000 !important;
+  border: 1px solid #f5c518 !important;
+  border-radius: 10px;
+  font-weight: 800;
+}
+.auth-card .auth-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+.auth-card .auth-links a {
+  color: #f5c518 !important;
+  text-decoration: none;
+}
+</style>
+<section class="auth-card">
+  <h2>Welcome Back</h2>
+  <p>Login to your investment account</p>
+  <form method="post">
+    <input class="auth-input" name="phone" type="tel"
+           placeholder="Phone Number" autocomplete="tel" required>
+    <input class="auth-input" name="password" type="password"
+           placeholder="Login Password" autocomplete="current-password" required>
+    <button class="auth-btn" type="submit">LOGIN</button>
+  </form>
+  <div class="auth-links">
+    <a href="/register">Create Account</a>
+    <a href="/reset">Forgot Password?</a>
+  </div>
+</section>
+{% endblock %}

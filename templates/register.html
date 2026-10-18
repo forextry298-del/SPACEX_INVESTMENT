@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+.auth-card {
+  max-width: 420px;
+  margin: 28px auto;
+  padding: 25px 20px;
+  box-sizing: border-box;
+  background: #090909 !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 18px;
+  box-shadow: 0 0 22px rgba(245,197,24,.08) !important;
+}
+.auth-card h2 {
+  color: #f5c518 !important;
+  text-align: center;
+  margin: 0 0 8px;
+}
+.auth-card p {
+  color: #ccc !important;
+  text-align: center;
+}
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.auth-card .auth-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 13px;
+  box-sizing: border-box;
+  background: #000 !important;
+  color: #fff !important;
+  border: 1px solid #8c8c8c !important;
+  border-radius: 10px;
+  outline: none;
+}
+.auth-card .auth-input:focus {
+  border-color: #f5c518 !important;
+}
+.auth-card .auth-input::placeholder {
+  color: #aaa !important;
+  opacity: 1;
+}
+.captcha-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.captcha-row .auth-input {
+  flex: 1;
+  min-width: 0;
+}
+.captcha-row span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  min-height: 46px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  background: #f5c518 !important;
+  color: #000 !important;
+  border-radius: 9px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+.auth-card .auth-btn {
+  min-height: 49px;
+  margin-top: 5px;
+  background: #f5c518 !important;
+  color: #000 !important;
+  border: 0 !important;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.auth-card .auth-links {
+  margin-top: 18px;
+  text-align: center;
+}
+.auth-card .auth-links a {
+  color: #f5c518 !important;
+  text-decoration: none;
+}
+</style>
+
+<section class="auth-card">
+  <h2>Welcome</h2>
+  
+  <form method="post">
+    <input class="auth-input" name="phone" type="tel"
+           placeholder="Phone Number" autocomplete="tel" required>
+    <input class="auth-input" name="password" type="password"
+           placeholder="Set Password" autocomplete="new-password" required>
+    <input class="auth-input" name="confirm" type="password"
+           placeholder="Confirm Password" autocomplete="new-password" required>
+    <div class="captcha-row">
+      <input class="auth-input" name="captcha_input"
+             placeholder="Verification code" required>
+      <span>{{ real_captcha }}</span>
+    </div>
+    <input type="hidden" name="real_captcha" value="{{ real_captcha }}">
+    <input class="auth-input" name="invite" value="{{ invite }}"
+           placeholder="Invitation Code">
+    <button class="auth-btn" type="submit">CREATE ACCOUNT</button>
+  </form>
+  <div class="auth-links">
+    <a href="/login">Already have an account? Login</a>
+  </div>
+</section>
+{% endblock %}

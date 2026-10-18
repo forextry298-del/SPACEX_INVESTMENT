@@ -1,0 +1,33 @@
+nile_ai.db
+*.db
+
+# Secrets and local data
+.env
+*.db
+*.db-wal
+*.db-shm
+__pycache__/
+*.pyc
+
+# Backups and temporary files
+*.before_*
+*.backup*
+backup_before_*/
+fix_aixora.py
+^C
+const
+codex_app_source.py
+
+# Local helpers and temporary output
+fix_aixora.py
+fix_bills.py
+*.db
+*.db-wal
+*.db-shm
+.env
+__pycache__/
+*.pyc
+backup_before_*/
+
+# User uploads are kept out of the repository
+static/uploads/
